@@ -1,0 +1,45 @@
+micronaut:
+  application:
+    name: ${project.artifactId}
+
+  server:
+    port: 8080
+
+  metrics:
+    enabled: true
+    export:
+      prometheus:
+        step: PT2s
+        descriptions: false
+
+  http:
+    client:
+      read-timeout: 30s
+    services:
+      read-timeout: 30s
+      broker:
+        path: ngsi-ld/v1
+        url: http://localhost:1026
+        read-timeout: 30
+      contract-service:
+        url: http://localhost:9080
+        read-timeout: 30
+
+---
+endpoints:
+  metrics:
+    enabled: true
+  health:
+    enabled: true
+
+loggers:
+  levels:
+    ROOT: TRACE
+    io:
+      micronaut:
+        http:
+          client: TRACE
+---
+general:
+  contextUrl: https://smartdatamodels.org/context.jsonld
+  tenant: impress

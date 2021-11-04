@@ -1,0 +1,446 @@
+openapi: 3.0.3
+info:
+  description: 'The spec describes the API for the BaaS demonstrator'
+  version: latest
+  title: BaaS API
+  contact:
+    email: stefan.wiedemann@fiware.org
+tags:
+  - name: Machines
+    description: Machine focused information
+  - name: Billing
+    description: Billing focused information
+paths:
+  '/machines':
+    get:
+      parameters:
+        - $ref: '#/components/parameters/latitude'
+        - $ref: '#/components/parameters/longitude'
+        - $ref: '#/components/parameters/perimeter'
+        - $ref: '#/components/parameters/pageSize'
+        - $ref: '#/components/parameters/pageAnchor'
+      tags:
+        - Machines
+      description: Get available machines by coordinates
+      operationId: getMachinesByCoordinates
+      responses:
+        '200':
+          description: List of machines at the requested location
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MachineList'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  '/machines/info':
+    get:
+      parameters:
+        - $ref: '#/components/parameters/latitude'
+        - $ref: '#/components/parameters/longitude'
+        - $ref: '#/components/parameters/perimeter'
+      tags:
+        - Machines
+      description: Get available information for the machines by coordinates
+      operationId: getMachineInfoByCoordinates
+      responses:
+        '200':
+          description: Information object for the machines at the requested location
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MachineInfo'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  '/machine/{id}':
+    get:
+      parameters:
+        - $ref: '#/components/parameters/id'
+      tags:
+        - Machines
+      description: Get machine by id.
+      operationId: getMachinesById
+      responses:
+        '200':
+          description: Machine with the given id
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Machine'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  '/machines/{id}/monitoring/{property}':
+    get:
+      parameters:
+        - $ref: '#/components/parameters/id'
+        - $ref: '#/components/parameters/property'
+        - $ref: '#/components/parameters/dateAt'
+      tags:
+        - Machines
+      description: Get monitoring infromation by id and date.
+      operationId: getMachineMonitoringAtDate
+      responses:
+        '200':
+          description: History of the requested property.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PropertyHistory'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+  '/invoices':
+    get:
+      parameters:
+        - $ref: '#/components/parameters/pageSize'
+        - $ref: '#/components/parameters/pageAnchor'
+      tags:
+        - Billing
+      description: Get all invoices
+      operationId: getInvoices
+      responses:
+        '200':
+          description: All available invoices
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvoiceList'
+  '/invoices/{id}':
+    get:
+      parameters:
+        - $ref: '#/components/parameters/id'
+      tags:
+        - Billing
+      description: Get the concrete invoice
+      operationId: getInvoiceById
+      responses:
+        '200':
+          description: All available invoices
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Invoice'
+        '404':
+          description: No such invoice exists
+components:
+  parameters:
+    perimeter:
+      name: perimeter
+      description: 'Perimeter around the requested coordinates.'
+      in: query
+      required: true
+      schema:
+        type: number
+    latitude:
+      name: lat
+      description: 'Latitude of the coordinate.'
+      in: query
+      required: true
+      schema:
+        type: string
+    longitude:
+      name: longi
+      description: 'Longitude of the coordinate.'
+      in: query
+      required: true
+      schema:
+        type: string
+    pageSize:
+      name: pageSize
+      description: 'Size of the requested page.'
+      in: query
+      required: true
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 100
+    pageAnchor:
+      name: pageAnchor
+      description: 'Anchor of the requested page.'
+      in: query
+      required: true
+      schema:
+        type: string
+    dateAt:
+      name: dateAt
+      description: 'Date to get the data at'
+      in: query
+      required: true
+      schema:
+        type: string
+        format: date
+    id:
+      name: id
+      description: 'Id of the entity to get.'
+      in: path
+      required: true
+      schema:
+        type: string
+    property:
+      name: property
+      description: 'Property to get montioring info.'
+      in: path
+      required: true
+      schema:
+        type: string
+  schemas:
+    InvoiceList:
+      type: object
+      properties:
+        pageSize:
+          type: integer
+          default: 100
+          maximum: 100
+        pageAnchor:
+          type: string
+        total:
+          type: integer
+        invoices:
+          type: array
+          items:
+            $ref: '#/components/schemas/InvoiceOverview'
+      required:
+        - pageSize
+        - pageAnchor
+        - total
+        - invoices
+    InvoiceOverview:
+      type: object
+      description: 'Overview for of a given invoice.'
+      properties:
+        invoiceId:
+          type: string
+          example: 12345
+        customer:
+          type: string
+          example: 'Condecta GmbH'
+        machineId:
+          type: string
+        creationDate:
+          type: string
+          format: date
+        amount:
+          type: number
+          example: 321,05
+    Invoice:
+      type: object
+      description: 'Detailed invoice information.'
+      properties:
+        overview:
+          $ref: '#/components/schemas/InvoiceOverview'
+        customer:
+          $ref: '#/components/schemas/LegalPerson'
+        discount:
+          description: 'Given discount in percent.'
+          type: number
+          example: '12,9'
+        tax:
+          description: 'Declared value added tax.'
+          type: number
+          example: '12,9'
+        services:
+          type: array
+          items:
+            $ref: '#/components/schemas/Service'
+    LegalPerson:
+      type: object
+      description: 'Information about a legal person.'
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          example: 'David James'
+        address:
+          $ref: '#/components/schemas/Address'
+    Service:
+      type: object
+      description: 'Provided service'
+      properties:
+        name:
+          type: string
+          example: 'Smart Service 1'
+        description:
+          type: string
+        amount:
+          type: number
+        unit:
+          type: string
+        price:
+          type: number
+          example: 1337,72
+      required:
+        - name
+        - description
+    Address:
+      type: object
+      properties:
+        street:
+          type: string
+          example: 'Industriestraße 54'
+        city:
+          type: string
+          example: 'Paderborn'
+        zipcode:
+          type: string
+          example: '33100'
+    PropertyInstance:
+      type: object
+      properties:
+        value:
+          type: number
+        date:
+          type: integer
+          description: "Timestamp of the instance."
+      required:
+        - value
+        - date
+    PropertyHistory:
+      type: array
+      items:
+        $ref: '#/components/schemas/PropertyInstance'
+    MachineList:
+      type: object
+      properties:
+        pageSize:
+          type: integer
+          default: 100
+          maximum: 100
+        pageAnchor:
+          type: string
+        total:
+          type: integer
+        machines:
+          type: array
+          items:
+            $ref: '#/components/schemas/Machine'
+      required:
+        - pageSize
+        - pageAnchor
+        - total
+        - machines
+    Maintenance:
+      type: object
+      properties:
+        last:
+          description: 'Last date of maintenance'
+          type: string
+          format: 'date'
+        next:
+          description: 'Next date of maintenance'
+          type: string
+          format: 'date'
+      required:
+        - last
+    Machine:
+      type: object
+      properties:
+        id:
+          description: 'Id of the returend machine.'
+          type: string
+        type:
+          description: 'Type of the machine'
+          type: string
+          example: 'Baukran'
+        model:
+          description: 'Concrete model'
+          type: string
+          example: 'Euro SSG 130'
+        generalInformation:
+          $ref: '#/components/schemas/GeneralMachineInformation'
+        usageInformation:
+          $ref: '#/components/schemas/UsageInformation'
+        bookings:
+          type: array
+          items:
+            $ref: '#/components/schemas/Booking'
+      required:
+        - id
+        - type
+        - model
+    GeneralMachineInformation:
+      description: 'General information of a concrete machine.'
+      type: object
+      additionalProperties: true
+      example: '
+        {
+          "maxRadius": 60,
+          "maxHookHeight": 65,
+          "maxPayload": 8000,
+          "payloadAtTip": 1650
+        }
+      '
+    UsageInformation:
+      description: 'Usage information of a concrete machine.'
+      type: object
+      properties:
+        averageUsage:
+          description: 'Average usage of the machines over the last month in hours.'
+          type: number
+        averageAvailability:
+          description: 'Average availability of the machines over the last month in hours.'
+          type: number
+        maintenanceInfo:
+          $ref: '#/components/schemas/Maintenance'
+        currentCustomer:
+          description: 'Customer currently using the machine.'
+          type: string
+          example: 'Condecta'
+    MachineInfo:
+      type: object
+      properties:
+        available:
+          description: 'Machines available for use.'
+          type: integer
+        inUse:
+          description: 'Machines currently in use.'
+          type: integer
+        averageUsage:
+          description: 'Average usage of the machines over the last month in hours.'
+          type: number
+        averageAvailability:
+          description: 'Average availability of the machines over the last month in hours.'
+          type: number
+    Booking:
+      type: object
+      properties:
+        customer:
+          type: string
+        startDate:
+          type: string
+          format: date-time
+        endDate:
+          type: string
+          format: date-time
+      required:
+        - customer
+        - startDate
+        - endDate
+    ProblemDetails:
+      type: object
+      properties:
+        type:
+          type: string
+          format: uri
+        title:
+          type: string
+        detail:
+          type: string
+      required:
+        - type

@@ -1,0 +1,24 @@
+name: Test
+
+on:
+  push:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+
+    steps:
+
+      - uses: actions/checkout@v2
+
+      - name: Log into registry
+        run: docker login -u "${{ secrets.DOCKER_USERNAME }}" -p "${{ secrets.DOCKER_PASSWORD }}" quay.io
+
+      - uses: actions/setup-java@v1
+        with:
+          java-version: '17'
+          java-package: jdk
+
+      - name: Run tests
+        run: mvn clean test coveralls:jacoco -Dcoveralls.token=${{ secrets.COVERALLS_TOKEN }}
