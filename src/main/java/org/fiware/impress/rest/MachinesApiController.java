@@ -13,6 +13,7 @@ import org.fiware.impress.repository.MachineRepository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -27,20 +28,20 @@ public class MachinesApiController implements MachinesApi {
 	private final EntityMapper entityMapper;
 
 	@Override
-	public MachineInfoVO getMachineInfoByCoordinates(String lat, String longi, Double perimeter) {
+	public MachineInfoVO getMachineInfoByCoordinates(Double lat, Double longi, Double perimeter) {
 		return entityMapper.machineInfoToMachineInfoVO(machineRepository.getMachineInfoByCoordinates(lat, longi, perimeter));
 	}
 
 	@Override
-	public MachineListVO getMachinesByCoordinates(String lat, String longi, Double perimeter, Integer pageSize, String pageAnchor) {
+	public MachineListVO getMachinesByCoordinates(Double lat, Double longi, Double perimeter, Optional<Integer> pageSize, Optional<String> pageAnchor) {
 		List<MachineVO> machines = machineRepository
 				.getMachinesByCoordinates(lat, longi, perimeter)
 				.stream()
 				.map(entityMapper::machineToMachineVO)
 				.collect(Collectors.toList());
 		return new MachineListVO().machines(machines)
-				.pageSize(pageSize)
-				.pageAnchor(pageAnchor)
+				.pageSize(pageSize.orElse(null))
+				.pageAnchor(pageAnchor.orElse(null))
 				.total(machines.size());
 	}
 

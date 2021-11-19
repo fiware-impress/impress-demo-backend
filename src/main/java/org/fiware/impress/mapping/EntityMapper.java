@@ -21,7 +21,6 @@ import org.fiware.impress.model.Machine;
 import org.fiware.impress.model.MachineInfo;
 import org.fiware.impress.model.Organization;
 import org.fiware.impress.model.SmartService;
-import org.fiware.impress.model.UsageInformation;
 import org.fiware.impress.repository.OrganizationRepository;
 import org.fiware.impress.repository.ServiceInfoRepository;
 import org.mapstruct.Mapper;
@@ -29,12 +28,13 @@ import org.mapstruct.Mapper;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 @Mapper(componentModel = "jsr330")
 public interface EntityMapper {
 
-	static final String DEFAULT_MODEL = "noModelDefined";
+	String DEFAULT_MODEL = "noModelDefined";
 
 	default Invoice invoiceVOToInvoice(InvoiceVO invoiceVO, ServiceInfoRepository serviceInfoRepository) {
 		String invoiceId = invoiceVO.getId();
@@ -70,20 +70,36 @@ public interface EntityMapper {
 	}
 
 	default MachineVO machineToMachineVO(Machine machine) {
-		MaintenanceVO maintenanceVO = new MaintenanceVO()
-				.next(machine.nextMaintenance())
-				.last(machine.lastMaintenance());
+		MaintenanceVO maintenanceVO = new MaintenanceVO();
+		Optional<LocalDate> optionalNextMaintenance = Optional.ofNullable(machine.nextMaintenance());
+		Optional<LocalDate> optionalLastMaintenance = Optional.ofNullable(machine.lastMaintenance());
+
+		optionalNextMaintenance.ifPresent(next -> maintenanceVO.next(next));
+		optionalLastMaintenance.ifPresent(last -> maintenanceVO.last(last));
+
+
 		UsageInformationVO usageInformationVO = new UsageInformationVO();
 		usageInformationVO.averageUsage(machine.averageUsage())
-				.averageAvailability(machine.averageAvailability())
-				.currentCustomer(machine.currentCustomer())
-				.maintenanceInfo(maintenanceVO);
+				.averageAvailability(machine.averageAvailability());
+		if (machine.currentCustomer() == null || machine.currentCustomer().isEmpty()) {
+			usageInformationVO.currentCustomer(null);
+		} else {
+			usageInformationVO.currentCustomer(machine.currentCustomer());
+		}
+		if (optionalNextMaintenance.isPresent() || optionalLastMaintenance.isPresent()) {
+			usageInformationVO.maintenanceInfo(maintenanceVO);
+		} else {
+			usageInformationVO.maintenanceInfo(null);
+		}
+
+		GeneralMachineInformationVO generalMachineInformationVO = new GeneralMachineInformationVO();
+		generalMachineInformationVO.putAll(machine.generalInfo());
 
 		MachineVO machineVO = new MachineVO();
 		machineVO.id(machine.id())
 				.model(machine.model())
 				.type(machine.type())
-				.generalInformation((GeneralMachineInformationVO) machine.generalInfo())
+				.generalInformation(generalMachineInformationVO)
 				.usageInformation(usageInformationVO);
 		// TODO: Bookings
 		return machineVO;
@@ -95,16 +111,22 @@ public interface EntityMapper {
 
 		String model = (String) ((Map) additionalProperties.getOrDefault("model", Map.of("value", DEFAULT_MODEL))).get("value");
 		boolean inUse = (Boolean) ((Map) additionalProperties.getOrDefault("inUse", Map.of("value", false))).get("value");
-		LocalDate lastMaintenance = (LocalDate) ((Map) additionalProperties.getOrDefault("lastMaintenance", Map.of("value", null))).get("value");
-		LocalDate nextMaintenance = (LocalDate) ((Map) additionalProperties.getOrDefault("nextMaintenance", Map.of("value", null))).get("value");
+		LocalDate lastMaintenance = null;
+		LocalDate nextMaintenance = null;
+		if (additionalProperties.containsKey("nextMaintenance")) {
+			nextMaintenance = (LocalDate) ((Map) additionalProperties.get("nextMaintenance")).get("value");
+			additionalProperties.remove("nextMaintenance");
+		}
+		if (additionalProperties.containsKey("lastMaintenance")) {
+			lastMaintenance = (LocalDate) ((Map) additionalProperties.get("lastMaintenance")).get("value");
+			additionalProperties.remove("lastMaintenance");
+		}
 		Double averageUsage = (Double) ((Map) additionalProperties.getOrDefault("averageUsage", Map.of("value", 0d))).get("value");
 		Double averageAvailability = (Double) ((Map) additionalProperties.getOrDefault("averageAvailability", Map.of("value", 0d))).get("value");
 		String currentCustomer = (String) ((Map) additionalProperties.getOrDefault("currentCustomer", Map.of("value", ""))).get("value");
 
 		additionalProperties.remove("model");
 		additionalProperties.remove("inUse");
-		additionalProperties.remove("lastMaintenance");
-		additionalProperties.remove("nextMaintenance");
 		additionalProperties.remove("averageUsage");
 		additionalProperties.remove("averageAvailability");
 		additionalProperties.remove("currentCustomer");

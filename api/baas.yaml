@@ -5,11 +5,17 @@ info:
   title: BaaS API
   contact:
     email: stefan.wiedemann@fiware.org
+
+servers:
+  - url: http://localhost:8080/
+    description: Local testing server to connect with
+
 tags:
   - name: Machines
     description: Machine focused information
   - name: Billing
     description: Billing focused information
+
 paths:
   '/machines':
     get:
@@ -151,19 +157,18 @@ components:
       in: query
       required: true
       schema:
-        type: string
+        type: number
     longitude:
       name: longi
       description: 'Longitude of the coordinate.'
       in: query
       required: true
       schema:
-        type: string
+        type: number
     pageSize:
       name: pageSize
       description: 'Size of the requested page.'
       in: query
-      required: true
       schema:
         type: integer
         minimum: 1
@@ -173,7 +178,6 @@ components:
       name: pageAnchor
       description: 'Anchor of the requested page.'
       in: query
-      required: true
       schema:
         type: string
     dateAt:

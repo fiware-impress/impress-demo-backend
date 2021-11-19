@@ -80,6 +80,8 @@
         <jacoco.reportFolder>${project.build.directory}/site/jacoco</jacoco.reportFolder>
         <jacoco.utReportFile>${jacoco.reportFolder}/test.exec</jacoco.utReportFile>
         <spotbugs.reportFolder>${project.build.directory}/site/spotbugs</spotbugs.reportFolder>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
 
     </properties>
 
@@ -424,6 +426,8 @@
                         <arg>-Amicronaut.processing.group=org.fiware.impress</arg>
                         <arg>-Amicronaut.processing.module=DemoBackend</arg>
                     </compilerArgs>
+                    <source>16</source>
+                    <target>16</target>
                 </configuration>
                 <executions>
                     <execution>

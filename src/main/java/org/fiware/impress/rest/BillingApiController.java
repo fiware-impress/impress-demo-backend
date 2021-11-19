@@ -15,6 +15,7 @@ import org.fiware.impress.model.Organization;
 import org.fiware.impress.repository.InvoiceRepository;
 import org.fiware.impress.repository.OrganizationRepository;
 import org.fiware.impress.repository.SmartServiceRepository;
+import org.graalvm.compiler.nodes.calc.IntegerDivRemNode;
 
 import java.net.URI;
 import java.rmi.dgc.Lease;
@@ -43,7 +44,7 @@ public class BillingApiController implements BillingApi {
 	}
 
 	@Override
-	public InvoiceListVO getInvoices(Integer pageSize, String pageAnchor) {
+	public InvoiceListVO getInvoices(Optional<Integer> pageSize, Optional<String> pageAnchor) {
 		List<InvoiceOverviewVO> invoiceOverviews = invoiceRepository
 				.getInvoices()
 				.stream()

@@ -1,19 +1,20 @@
 package org.fiware.impress.repository;
 
-import org.fiware.baas.model.MachineInfoVO;
-import org.fiware.baas.model.MachineVO;
+import lombok.extern.slf4j.Slf4j;
 import org.fiware.broker.api.EntitiesApiClient;
 import org.fiware.impress.configuration.GeneralProperties;
 import org.fiware.impress.mapping.EntityMapper;
 import org.fiware.impress.model.Machine;
 import org.fiware.impress.model.MachineInfo;
 
+import javax.inject.Singleton;
 import java.net.URI;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Slf4j
+@Singleton
 public class MachineRepository extends BrokerBaseRepository {
 
 	// the demo currently only supports machines of type crane. Can be extended in the future.
@@ -23,8 +24,8 @@ public class MachineRepository extends BrokerBaseRepository {
 		super(generalProperties, entitiesApi, entityMapper);
 	}
 
-	public List<Machine> getMachinesByCoordinates(String lat, String longi, Double perimeter) {
-		return entitiesApi.queryEntities(
+	public List<Machine> getMachinesByCoordinates(Double lat, Double longi, Double perimeter) {
+		return Optional.ofNullable(entitiesApi.queryEntities(
 						generalProperties.getTenant(),
 						null,
 						null,
@@ -38,12 +39,11 @@ public class MachineRepository extends BrokerBaseRepository {
 						null,
 						null,
 						null,
-						getLinkHeader()).body().stream()
-				.map(entityMapper::entityVoToMachine)
-				.collect(Collectors.toList());
+						getLinkHeader())
+				.body()).map(entityVOS -> entityVOS.stream().map(entityMapper::entityVoToMachine).collect(Collectors.toList())).orElse(List.of());
 	}
 
-	public MachineInfo getMachineInfoByCoordinates(String lat, String longi, Double perimeter) {
+	public MachineInfo getMachineInfoByCoordinates(Double lat, Double longi, Double perimeter) {
 		List<Machine> machines = getMachinesByCoordinates(lat, longi, perimeter);
 		int machinesInUse = machines.stream().filter(Machine::inUse).collect(Collectors.counting()).intValue();
 		int machinesAvailable = machines.size() - machinesInUse;

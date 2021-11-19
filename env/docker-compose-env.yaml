@@ -95,7 +95,7 @@ services:
       - default
 
   contract-service:
-    image: quay.io/wi_stefan/contract-service:0.0.3
+    image: quay.io/wi_stefan/contract-service:0.0.4
     hostname: contract-service
     depends_on:
       - orion-ld
@@ -107,22 +107,6 @@ services:
       - MICRONAUT_HTTP_SERVICES_BROKER_URL=http://orion-ld:1026
       - MICRONAUT_HTTP_SERVICES_PERSEO_URL=http://perseo-fe:9090
       - GENERAL_CONTRACT_SERVICE_CALLBACK_URL=http://contract-service:8080/callback
-    networks:
-      - default
-
-  baas-backend:
-    image: quay.io/wi_stefan/demo-backend:latest
-    hostname: baas-backend
-    depends_on:
-      - contract-service
-      - orion-ld
-    expose:
-      - "8080"
-    ports:
-      - "9070:8080"
-    environment:
-      - MICRONAUT_HTTP_SERVICES_BROKER_URL=http://orion-ld:1026
-      - MICRONAUT_HTTP_SERVICES_CONTRACT_SERVICE_URL=http://contract-service:8080
     networks:
       - default
 
