@@ -63,7 +63,7 @@ public class MachineRepository extends BrokerBaseRepository {
 						entitiesApi.retrieveEntityById(generalProperties.getTenant(),
 								URI.create(id),
 								null,
-								MACHINE_TYPE,
+								null,
 								null,
 								getLinkHeader()).body()));
 	}
