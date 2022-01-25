@@ -121,8 +121,9 @@ public interface EntityMapper {
 			lastMaintenance = (LocalDate) ((Map) additionalProperties.get("lastMaintenance")).get("value");
 			additionalProperties.remove("lastMaintenance");
 		}
-		Double averageUsage = (Double) ((Map) additionalProperties.getOrDefault("averageUsage", Map.of("value", 0d))).get("value");
-		Double averageAvailability = (Double) ((Map) additionalProperties.getOrDefault("averageAvailability", Map.of("value", 0d))).get("value");
+
+		Double averageUsage = ((Number) ((Map) additionalProperties.getOrDefault("averageUsage", Map.of("value", 0d))).get("value")).doubleValue();
+		Double averageAvailability = ((Number) ((Map) additionalProperties.getOrDefault("averageAvailability", Map.of("value", 0d))).get("value")).doubleValue();
 		String currentCustomer = (String) ((Map) additionalProperties.getOrDefault("currentCustomer", Map.of("value", ""))).get("value");
 
 		additionalProperties.remove("model");
