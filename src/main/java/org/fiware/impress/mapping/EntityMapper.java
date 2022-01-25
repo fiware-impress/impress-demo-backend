@@ -116,11 +116,11 @@ public interface EntityMapper {
 		LocalDate lastMaintenance = null;
 		LocalDate nextMaintenance = null;
 		if (additionalProperties.containsKey("nextMaintenance")) {
-			nextMaintenance = (LocalDate) ((Map) additionalProperties.get("nextMaintenance")).get("value");
+			nextMaintenance = LocalDate.parse((String)((Map) additionalProperties.get("nextMaintenance")).get("value"));
 			additionalProperties.remove("nextMaintenance");
 		}
 		if (additionalProperties.containsKey("lastMaintenance")) {
-			lastMaintenance = (LocalDate) ((Map) additionalProperties.get("lastMaintenance")).get("value");
+			lastMaintenance = LocalDate.parse((String)((Map) additionalProperties.get("lastMaintenance")).get("value"));
 			additionalProperties.remove("lastMaintenance");
 		}
 

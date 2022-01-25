@@ -24,7 +24,9 @@ micronaut:
       contract-service:
         url: http://localhost:9080
         read-timeout: 30
-
+jackson:
+  serialization:
+    writeDatesAsTimestamps: false
 ---
 endpoints:
   metrics:
