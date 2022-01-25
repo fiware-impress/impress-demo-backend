@@ -27,8 +27,10 @@ import org.mapstruct.Mapper;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 @Mapper(componentModel = "jsr330")
@@ -131,6 +133,15 @@ public interface EntityMapper {
 		additionalProperties.remove("averageUsage");
 		additionalProperties.remove("averageAvailability");
 		additionalProperties.remove("currentCustomer");
+		Map<String, Object> generalInfo = new HashMap<>();
+		if(additionalProperties.containsKey("generalInformation")) {
+			Set<Map.Entry> entrySet =((Map)((Map)additionalProperties.get("generalInformation")).get("value")).entrySet();
+			entrySet.stream().forEach(e -> {
+				var key = (String)e.getKey();
+				var value = ((Map)e.getValue()).get("value");
+				generalInfo.put(key, value);
+			});
+		}
 
 		return new Machine(
 				entityVO.id().toString(),
@@ -142,7 +153,7 @@ public interface EntityMapper {
 				averageUsage,
 				averageAvailability,
 				currentCustomer,
-				additionalProperties);
+				generalInfo);
 	}
 
 	Organization organizationVOToOrganization(OrganizationVO organizationVO);
