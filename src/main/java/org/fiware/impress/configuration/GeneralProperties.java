@@ -20,5 +20,5 @@ public class GeneralProperties {
 		/**
 		 * Tenant to be used by the contract server.
 		 */
-		private String tenant;
+		private String tenant = null;
 }

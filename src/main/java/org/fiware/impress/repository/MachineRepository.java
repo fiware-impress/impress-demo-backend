@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 public class MachineRepository extends BrokerBaseRepository {
 
 	// the demo currently only supports machines of type crane. Can be extended in the future.
-	private static final String MACHINE_TYPE = "Crane";
+	private static final String MACHINE_TYPE = "crane";
 
 	public MachineRepository(GeneralProperties generalProperties, EntitiesApiClient entitiesApi, EntityMapper entityMapper) {
 		super(generalProperties, entitiesApi, entityMapper);
@@ -60,8 +60,9 @@ public class MachineRepository extends BrokerBaseRepository {
 	public Optional<Machine> getMachineById(String id) {
 		return Optional.ofNullable(entityMapper
 				.entityVoToMachine(
-						entitiesApi.retrieveEntityById(generalProperties.getTenant(),
+						entitiesApi.retrieveEntityById(
 								URI.create(id),
+								generalProperties.getTenant(),
 								null,
 								null,
 								null,

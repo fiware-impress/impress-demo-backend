@@ -44,4 +44,3 @@ loggers:
 ---
 general:
   contextUrl: https://smartdatamodels.org/context.jsonld
-  tenant: impress
