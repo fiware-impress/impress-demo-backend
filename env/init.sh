@@ -60,10 +60,10 @@ serviceId=$(curl -iL -X 'POST' \
       "measurementPoint": {
         "unitCode": "kg/m",
         "provider": {
-          "id": "urn:ngsi-ld:crane:crane-c1-1",
+          "id": "urn:ngsi-ld:crane:lego-crane",
           "type": "crane"
         },
-        "measurementQuery": "select ev.currentUsage? as CurrentValue from pattern [every ev=iotEvent(cast(cast(currentUsage?, int)%10,int)=0 and type=\"crane\")]"
+        "measurementQuery": "select ev.currentWeight? as CurrentValue from pattern [every ev=iotEvent(cast(cast(currentWeight?, int)%10,int)=0 and type=\"crane\")]"
       }
     }
   ]
@@ -85,7 +85,7 @@ offerId=$(curl -iL -X 'POST' \
 }' | awk 'BEGIN {FS=": "}/^location/{print $2}' | sed -e 's/\r//')
 
 # create the order - get the id for the offer and both companies first
-curl -X 'POST' \
+curl -iL -X 'POST' \
   'http://localhost:9080/order' \
   -H 'accept: */*' \
   -H 'Content-Type: application/json' \
@@ -106,5 +106,3 @@ curl -X 'POST' \
   "paymentMethod": "ByInvoice",
   "orderNumber": "Order-123"
 }'
-
-# create subscription

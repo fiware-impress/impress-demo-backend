@@ -58,7 +58,7 @@ services:
       - mongo-db
 
   perseo-fe:
-    image: fiware/perseo
+    image: fiware/perseo:1.17.0
     networks:
       - default
     expose:
@@ -109,13 +109,9 @@ services:
       - "7080:8080"
     networks:
       - default
-    healthcheck:
-      test: curl --fail -s http://mintaka:8080/health || exit 1
-      interval: 30s
-      retries: 15
 
   contract-service:
-    image: quay.io/wi_stefan/contract-service:latest
+    image: quay.io/wi_stefan/contract-service:latest-9
     hostname: contract-service
     depends_on:
       - orion-ld
@@ -126,11 +122,14 @@ services:
     environment:
       - MICRONAUT_HTTP_SERVICES_BROKER_URL=http://orion-ld:1026
       - MICRONAUT_HTTP_SERVICES_PERSEO_URL=http://perseo-fe:9090
+      - MICRONAUT_HTTP_SERVICES_DN_URL=http://dn:5001
       - GENERAL_CONTRACT_SERVICE_CALLBACK_URL=http://contract-service:8080/callback
       - GENERAL_PERSEO_URL=http://perseo-fe:9090/notices
       - GENERAL_TENANT=impress
     networks:
       - default
+    volumes:
+      - invoices:/invoices
 
   baas-backend:
     image: quay.io/wi_stefan/demo-backend:latest
@@ -262,6 +261,31 @@ services:
         mongo --quiet $host/test --eval 'quit(db.runCommand({ ping: 1 }).ok ? 0 : 2)' && echo 0 || echo 1
       interval: 30s
 
+  mosquitto:
+    image: eclipse-mosquitto
+    hostname: mosquitto
+    expose:
+      - "1883"
+    ports:
+      - "1883:1883"
+    networks:
+      - default
+    volumes:
+      - ./mosquitto.conf:/mosquitto/config/mosquitto.conf
+
+  lego-subsciber:
+    image: quay.io/wi_stefan/lego-subscriber
+    networks:
+      - default
+    environment:
+      - DEV_GENERATOR_ENABLED=true
+      - MQTT_HOST=mosquitto
+      - NGSI_LD_HOST=orion
+    depends_on:
+      - orion-ld
+      - mosquitto
+
 volumes:
   mongo-db: ~
   mongo-db-wm: ~
+  invoices: ~

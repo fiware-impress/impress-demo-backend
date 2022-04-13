@@ -27,6 +27,7 @@ import org.mapstruct.Mapper;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -60,7 +61,7 @@ public interface EntityMapper {
 
 		InvoiceOverviewVO invoiceOverviewVO = new InvoiceOverviewVO()
 				.amount(invoice.amount().doubleValue())
-				.creationDate(LocalDate.from(invoice.creationDate()))
+				.creationDate(LocalDate.ofInstant(invoice.creationDate(), ZoneId.of("UTC")))
 				.customer(customer.legalName())
 				.machineId(invoice.machineId())
 				.invoiceId(invoice.invoiceId());
