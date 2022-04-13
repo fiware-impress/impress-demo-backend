@@ -111,7 +111,7 @@ services:
       - default
 
   contract-service:
-    image: quay.io/wi_stefan/contract-service:latest-9
+    image: quay.io/wi_stefan/contract-service:0.1.5
     hostname: contract-service
     depends_on:
       - orion-ld
