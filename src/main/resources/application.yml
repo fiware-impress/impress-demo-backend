@@ -4,6 +4,9 @@ micronaut:
 
   server:
     port: 8080
+    cors:
+      enabled: true
+      single-header: true
 
   metrics:
     enabled: true

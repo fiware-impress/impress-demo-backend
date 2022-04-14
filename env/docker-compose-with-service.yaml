@@ -144,7 +144,6 @@ services:
     environment:
       - MICRONAUT_HTTP_SERVICES_BROKER_URL=http://orion-ld:1026
       - MICRONAUT_HTTP_SERVICES_CONTRACT_SERVICE_URL=http://contract-service:8080
-      - MICRONAUT_SERVER_CORS_ENABLED=true
       - GENERAL_TENANT=impress
     networks:
       - default
