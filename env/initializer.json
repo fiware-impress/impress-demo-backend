@@ -1,0 +1,12 @@
+[
+  {
+    "httpRequest": {"specUrlOrPayload": "file:/api/baas.yaml", "operationId": "getMachinesById"},
+    "httpResponse": {"statusCode": 200, "headers": {"content-type": ["application/json"]},
+      "body": {
+        "id": "urn:ngsi-ld:crane:my-crane",
+        "type": "Baukran",
+        "model": "Euro SSG 130"
+      }
+    }
+  }
+]

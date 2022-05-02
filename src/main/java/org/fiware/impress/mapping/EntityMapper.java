@@ -1,5 +1,6 @@
 package org.fiware.impress.mapping;
 
+import lombok.extern.slf4j.Slf4j;
 import org.fiware.baas.model.AddressVO;
 import org.fiware.baas.model.EnergyInformationVO;
 import org.fiware.baas.model.GeneralMachineInformationVO;
@@ -110,7 +111,7 @@ public interface EntityMapper {
 		generalMachineInformationVO.maxLiftingWeight(((Number) machine.generalInfo().getOrDefault("maxLiftingWeight", 0)).doubleValue());
 		generalMachineInformationVO.currentWeight(((Number) machine.generalInfo().getOrDefault("currentWeight", 0)).doubleValue());
 		generalMachineInformationVO.maxHookHeight(((Number) machine.generalInfo().getOrDefault("maxHookHeight", 0)).doubleValue());
-		generalMachineInformationVO.location((List<Double>) ((Map) ((Map) machine.generalInfo().get("location")).get("value")).get("coordinates"));
+		generalMachineInformationVO.location((List<Double>) ((Map) machine.generalInfo().get("location")).get("coordinates"));
 
 		MachineVO machineVO = new MachineVO();
 		machineVO.id(machine.id())
