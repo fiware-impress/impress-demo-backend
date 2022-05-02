@@ -107,9 +107,9 @@ public interface EntityMapper {
 
 		GeneralMachineInformationVO generalMachineInformationVO = new GeneralMachineInformationVO();
 		generalMachineInformationVO.active((Boolean) machine.generalInfo().getOrDefault("active", false));
-		generalMachineInformationVO.maxLiftingWeight((Double) machine.generalInfo().getOrDefault("maxLiftingWeight", 0));
-		generalMachineInformationVO.currentWeight((Double) machine.generalInfo().getOrDefault("currentWeight", 0));
-		generalMachineInformationVO.maxHookHeight((Double) machine.generalInfo().getOrDefault("maxHookHeight", 0));
+		generalMachineInformationVO.maxLiftingWeight(((Number) machine.generalInfo().getOrDefault("maxLiftingWeight", 0)).doubleValue());
+		generalMachineInformationVO.currentWeight(((Number) machine.generalInfo().getOrDefault("currentWeight", 0)).doubleValue());
+		generalMachineInformationVO.maxHookHeight(((Number) machine.generalInfo().getOrDefault("maxHookHeight", 0)).doubleValue());
 		generalMachineInformationVO.location((List<Double>) ((Map) machine.generalInfo().get("location")).get("coordinates"));
 
 		MachineVO machineVO = new MachineVO();
