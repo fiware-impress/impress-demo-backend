@@ -132,7 +132,7 @@ services:
       - invoices:/invoices
 
   baas-backend:
-    image: quay.io/wi_stefan/demo-backend:latest
+    image: quay.io/wi_stefan/demo-backend
     hostname: baas-backend
     depends_on:
       - contract-service

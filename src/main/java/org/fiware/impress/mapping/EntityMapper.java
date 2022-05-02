@@ -76,9 +76,11 @@ public interface EntityMapper {
 				.customer(customer.legalName())
 				.machineId(invoice.machineId())
 				.invoiceId(invoice.invoiceId());
+
 		org.fiware.baas.model.InvoiceVO invoiceVO = new org.fiware.baas.model.InvoiceVO();
 		invoiceVO.customer(legalPersonVO);
 		invoiceVO.discount(invoice.discount().doubleValue());
+		invoiceVO.downloadLink(invoice.downloadLink().toString());
 		invoiceVO.setOverview(invoiceOverviewVO);
 		return invoiceVO;
 	}
