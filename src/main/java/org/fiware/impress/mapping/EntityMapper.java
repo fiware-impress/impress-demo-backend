@@ -33,6 +33,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -105,7 +106,11 @@ public interface EntityMapper {
 		}
 
 		GeneralMachineInformationVO generalMachineInformationVO = new GeneralMachineInformationVO();
-		generalMachineInformationVO.putAll(machine.generalInfo());
+		generalMachineInformationVO.active((Boolean) machine.generalInfo().getOrDefault("active", false));
+		generalMachineInformationVO.maxLiftingWeight((Double) machine.generalInfo().getOrDefault("maxLiftingWeight", 0));
+		generalMachineInformationVO.currentWeight((Double) machine.generalInfo().getOrDefault("currentWeight", 0));
+		generalMachineInformationVO.maxHookHeight((Double) machine.generalInfo().getOrDefault("maxHookHeight", 0));
+		generalMachineInformationVO.location((List<Double>) ((Map) machine.generalInfo().get("location")).get("coordinates"));
 
 		MachineVO machineVO = new MachineVO();
 		machineVO.id(machine.id())

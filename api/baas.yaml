@@ -377,8 +377,6 @@ components:
             - "HEALTHY"
             - "UNKNOWN"
             - "UNHEALTHY"
-        location:
-          $ref: '#/components/schemas/Location'
         usageInformation:
           $ref: '#/components/schemas/UsageInformation'
         energyInformation:
@@ -402,7 +400,19 @@ components:
     GeneralMachineInformation:
       description: 'General information of a concrete machine.'
       type: object
-      additionalProperties: true
+      properties:
+        maxLiftingWeight:
+          type: number
+        currentWeight:
+          type: number
+        maxHookHeight:
+          type: number
+        active:
+          type: boolean
+        location:
+          type: array
+          items:
+            type: number
       example: '
         {
           "maxRadius": 60,
