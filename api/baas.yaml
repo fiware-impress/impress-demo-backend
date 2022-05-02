@@ -409,10 +409,6 @@ components:
           type: number
         active:
           type: boolean
-        location:
-          type: array
-          items:
-            type: number
       example: '
         {
           "maxRadius": 60,
