@@ -432,8 +432,10 @@ components:
       type: object
       properties:
         currentConsumption:
+          description: 'Current consumption of the crane in kw'
           type: number
         currentCost:
+          description: 'Current price of the enery used by the crane in kw/h'
           type: number
     MachineInfo:
       type: object
