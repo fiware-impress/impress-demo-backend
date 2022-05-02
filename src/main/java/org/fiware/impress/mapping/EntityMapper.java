@@ -1,6 +1,7 @@
 package org.fiware.impress.mapping;
 
 import org.fiware.baas.model.AddressVO;
+import org.fiware.baas.model.EnergyInformationVO;
 import org.fiware.baas.model.GeneralMachineInformationVO;
 import org.fiware.baas.model.InvoiceOverviewVO;
 import org.fiware.baas.model.LegalPersonVO;
@@ -16,6 +17,7 @@ import org.fiware.contract.model.OrganizationVO;
 import org.fiware.contract.model.PriceDefinitionVO;
 import org.fiware.contract.model.ProviderVO;
 import org.fiware.contract.model.SmartServiceVO;
+import org.fiware.impress.model.EnergyInformation;
 import org.fiware.impress.model.Invoice;
 import org.fiware.impress.model.Machine;
 import org.fiware.impress.model.MachineInfo;
@@ -25,6 +27,8 @@ import org.fiware.impress.repository.OrganizationRepository;
 import org.fiware.impress.repository.ServiceInfoRepository;
 import org.mapstruct.Mapper;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -39,7 +43,7 @@ public interface EntityMapper {
 
 	String DEFAULT_MODEL = "noModelDefined";
 
-	default Invoice invoiceVOToInvoice(InvoiceVO invoiceVO, ServiceInfoRepository serviceInfoRepository) {
+	default Invoice invoiceVOToInvoice(InvoiceVO invoiceVO, ServiceInfoRepository serviceInfoRepository, String downloadLinkTemplate) {
 		String invoiceId = invoiceVO.getId();
 		String customerId = invoiceVO.getCustomer().getId();
 		Number amount = invoiceVO.getAmount();
@@ -51,7 +55,12 @@ public interface EntityMapper {
 				.map(OrderVO::acceptedOfferId)
 				.flatMap(serviceInfoRepository::getMachineIdByOfferId)
 				.orElse("");
-		return new Invoice(invoiceId, customerId, machineId, creationDate, amount, discount);
+		try {
+			URL downloadLink = new URL(String.format(downloadLinkTemplate, invoiceId));
+			return new Invoice(invoiceId, customerId, machineId, creationDate, amount, discount, downloadLink);
+		} catch (MalformedURLException e) {
+			throw new RuntimeException(String.format("Was not able to build downloadlink for %s.", invoiceId), e);
+		}
 	}
 
 	default org.fiware.baas.model.InvoiceVO invoiceToInvoiceVO(Invoice invoice, OrganizationRepository organizationRepository) {
@@ -103,10 +112,13 @@ public interface EntityMapper {
 				.model(machine.model())
 				.type(machine.type())
 				.generalInformation(generalMachineInformationVO)
-				.usageInformation(usageInformationVO);
+				.usageInformation(usageInformationVO)
+				.energyInformation(map(machine.energyInformation()));
 		// TODO: Bookings
 		return machineVO;
 	}
+
+	EnergyInformationVO map(EnergyInformation energyInformation);
 
 	default Machine entityVoToMachine(EntityVO entityVO) {
 
@@ -117,29 +129,32 @@ public interface EntityMapper {
 		LocalDate lastMaintenance = null;
 		LocalDate nextMaintenance = null;
 		if (additionalProperties.containsKey("nextMaintenance")) {
-			nextMaintenance = LocalDate.parse((String)((Map) additionalProperties.get("nextMaintenance")).get("value"));
+			nextMaintenance = LocalDate.parse((String) ((Map) additionalProperties.get("nextMaintenance")).get("value"));
 			additionalProperties.remove("nextMaintenance");
 		}
 		if (additionalProperties.containsKey("lastMaintenance")) {
-			lastMaintenance = LocalDate.parse((String)((Map) additionalProperties.get("lastMaintenance")).get("value"));
+			lastMaintenance = LocalDate.parse((String) ((Map) additionalProperties.get("lastMaintenance")).get("value"));
 			additionalProperties.remove("lastMaintenance");
 		}
 
+		Double currentConsumption = ((Number) ((Map) additionalProperties.getOrDefault("currentConsumption", Map.of("value", 0d))).get("value")).doubleValue();
+		Double currentCost = ((Number) ((Map) additionalProperties.getOrDefault("currentCost", Map.of("value", 40.20))).get("value")).doubleValue();
+		EnergyInformation energyInformation = new EnergyInformation(currentConsumption, currentCost);
 		Double averageUsage = ((Number) ((Map) additionalProperties.getOrDefault("averageUsage", Map.of("value", 0d))).get("value")).doubleValue();
 		Double averageAvailability = ((Number) ((Map) additionalProperties.getOrDefault("averageAvailability", Map.of("value", 0d))).get("value")).doubleValue();
 		String currentCustomer = (String) ((Map) additionalProperties.getOrDefault("currentCustomer", Map.of("value", ""))).get("value");
-
+		String healthStatus = (String) ((Map) additionalProperties.getOrDefault("healthState", Map.of("value", "UNKNONW"))).get("value");
 		additionalProperties.remove("model");
 		additionalProperties.remove("inUse");
 		additionalProperties.remove("averageUsage");
 		additionalProperties.remove("averageAvailability");
 		additionalProperties.remove("currentCustomer");
 		Map<String, Object> generalInfo = new HashMap<>();
-		if(additionalProperties.containsKey("generalInformation")) {
-			Set<Map.Entry> entrySet =((Map)((Map)additionalProperties.get("generalInformation")).get("value")).entrySet();
+		if (additionalProperties.containsKey("generalInformation")) {
+			Set<Map.Entry> entrySet = ((Map) ((Map) additionalProperties.get("generalInformation")).get("value")).entrySet();
 			entrySet.stream().forEach(e -> {
-				var key = (String)e.getKey();
-				var value = ((Map)e.getValue()).get("value");
+				var key = (String) e.getKey();
+				var value = ((Map) e.getValue()).get("value");
 				generalInfo.put(key, value);
 			});
 		}
@@ -154,7 +169,9 @@ public interface EntityMapper {
 				averageUsage,
 				averageAvailability,
 				currentCustomer,
-				generalInfo);
+				generalInfo,
+				healthStatus,
+				energyInformation);
 	}
 
 	Organization organizationVOToOrganization(OrganizationVO organizationVO);

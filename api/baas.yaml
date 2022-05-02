@@ -257,6 +257,9 @@ components:
           description: 'Declared value added tax.'
           type: number
           example: '12,9'
+        downloadLink:
+          type: string
+          format: url
         services:
           type: array
           items:
@@ -368,8 +371,18 @@ components:
           example: 'Euro SSG 130'
         generalInformation:
           $ref: '#/components/schemas/GeneralMachineInformation'
+        healthState:
+          type: string
+          enum:
+            - "HEALTHY"
+            - "UNKNOWN"
+            - "UNHEALTHY"
+        location:
+          $ref: '#/components/schemas/Location'
         usageInformation:
           $ref: '#/components/schemas/UsageInformation'
+        energyInformation:
+          $ref: '#/components/schemas/EnergyInformation'
         bookings:
           type: array
           items:
@@ -378,6 +391,14 @@ components:
         - id
         - type
         - model
+    Location:
+      description: 'Current location of the machine'
+      type: object
+      properties:
+        latitude:
+          type: number
+        longitude:
+          type: number
     GeneralMachineInformation:
       description: 'General information of a concrete machine.'
       type: object
@@ -406,6 +427,14 @@ components:
           description: 'Customer currently using the machine.'
           type: string
           example: 'Condecta'
+    EnergyInformation:
+      description: 'Information related to current energy consumption'
+      type: object
+      properties:
+        currentConsumption:
+          type: number
+        currentCost:
+          type: number
     MachineInfo:
       type: object
       properties:

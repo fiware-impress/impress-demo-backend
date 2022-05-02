@@ -47,3 +47,4 @@ loggers:
 ---
 general:
   contextUrl: https://smartdatamodels.org/context.jsonld
+  downloadLinkTemplate: "http://localhost:9080/invoice/%s/pdf"

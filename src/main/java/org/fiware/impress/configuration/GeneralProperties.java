@@ -21,4 +21,6 @@ public class GeneralProperties {
 		 * Tenant to be used by the contract server.
 		 */
 		private String tenant = null;
+
+		private String downloadLinkTemplate = "http://localhost:9080/invoice/%s/pdf";
 }
