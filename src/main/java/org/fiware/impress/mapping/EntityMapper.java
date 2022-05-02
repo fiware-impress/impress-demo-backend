@@ -120,6 +120,7 @@ public interface EntityMapper {
 				.type(machine.type())
 				.generalInformation(generalMachineInformationVO)
 				.usageInformation(usageInformationVO)
+				.healthState(MachineVO.HealthState.toEnum(machine.healthState()))
 				.energyInformation(map(machine.energyInformation()));
 		// TODO: Bookings
 		return machineVO;
