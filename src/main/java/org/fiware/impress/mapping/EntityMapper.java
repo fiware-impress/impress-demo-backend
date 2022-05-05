@@ -115,7 +115,6 @@ public interface EntityMapper {
 		generalMachineInformationVO.maxHookHeight(((Number) machine.generalInfo().getOrDefault("maxHookHeight", 0)).doubleValue());
 		generalMachineInformationVO.payLoadAtTip(((Number) machine.generalInfo().getOrDefault("payLoadAtTip", 0)).doubleValue());
 		generalMachineInformationVO.maxRadius(((Number) machine.generalInfo().getOrDefault("maxRadius", 0)).doubleValue());
-
 		MachineVO machineVO = new MachineVO();
 		machineVO.id(machine.id())
 				.model(machine.model())
@@ -153,7 +152,7 @@ public interface EntityMapper {
 		Double averageUsage = ((Number) ((Map) additionalProperties.getOrDefault("averageUsage", Map.of("value", 0d))).get("value")).doubleValue();
 		Double averageAvailability = ((Number) ((Map) additionalProperties.getOrDefault("averageAvailability", Map.of("value", 0d))).get("value")).doubleValue();
 		String currentCustomer = (String) ((Map) additionalProperties.getOrDefault("currentCustomer", Map.of("value", ""))).get("value");
-
+		boolean active = (Boolean) ((Map) additionalProperties.getOrDefault("active", Map.of("value", false))).get("value");
 		String healthStatus = (String) ((Map) additionalProperties.getOrDefault("healthState", Map.of("value", "UNKNONW"))).get("value");
 		additionalProperties.remove("model");
 		additionalProperties.remove("inUse");
@@ -168,6 +167,7 @@ public interface EntityMapper {
 				var value = ((Map) e.getValue()).get("value");
 				generalInfo.put(key, value);
 			});
+			generalInfo.put("active", active);
 		}
 
 		return new Machine(
