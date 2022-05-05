@@ -63,7 +63,7 @@ serviceId=$(curl -iL -X 'POST' \
           "id": "urn:ngsi-ld:crane:lego-crane",
           "type": "crane"
         },
-        "measurementQuery": "select ev.currentWeight? as CurrentValue from pattern [every ev=iotEvent(cast(cast(currentWeight?, int)%10,int)=0 and type=\"crane\")]"
+        "measurementQuery": "select ev.currentWeight? as CurrentValue from pattern [every ev=iotEvent(cast(cast(currentWeight?, int),int)=25000 and type=\"crane\")]"
       }
     }
   ]

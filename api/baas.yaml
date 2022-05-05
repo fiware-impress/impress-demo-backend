@@ -407,6 +407,10 @@ components:
           type: number
         maxHookHeight:
           type: number
+        maxRadius:
+          type: number
+        payLoadAtTip:
+          type: number
         active:
           type: boolean
       example: '
