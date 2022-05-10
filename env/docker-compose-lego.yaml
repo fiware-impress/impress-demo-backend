@@ -160,7 +160,7 @@ services:
       - default
 
   frontend:
-    image: wistefan/itd:0.0.1
+    image: wistefan/itd:0.0.2
     hostname: impress-frontend
     ports:
       - 5000:5000
